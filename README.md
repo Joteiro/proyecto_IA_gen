@@ -38,7 +38,9 @@ Pregunta ──▶ Agente LangGraph (create_react_agent, Gemini)
             Respuesta citando fuente + memoria por thread_id
 ```
 
-- **LLM y Embeddings:** Google Gemini (`gemini-2.5-flash-lite` + `gemini-embedding-001`).
+- **LLM de chat:** configurable vía `LLM_PROVIDER` — **Groq** (`llama-3.3-70b-versatile`,
+  free tier amplio, por defecto) o **Gemini** (`gemini-2.5-flash-lite`). Ambos vía LangChain.
+- **Embeddings:** Google Gemini (`gemini-embedding-001`) — su cuota es independiente de la de chat.
 - **Base vectorial:** ChromaDB, **dos colecciones** (una por reglamento) para que
   el enrutamiento sea explícito.
 - **Agente:** `create_react_agent` de **LangGraph**, con dos herramientas de

@@ -1,5 +1,8 @@
-# Núcleo LLM + Embeddings (Google Gemini)
+# Núcleo LLM + Embeddings (Google Gemini para embeddings)
 langchain-google-genai>=2.0.0
+
+# LLM de chat alternativo (Groq: free tier amplio) — LLM_PROVIDER=groq
+langchain-groq>=0.2.0
 
 # Framework de agente
 langchain>=0.3.0

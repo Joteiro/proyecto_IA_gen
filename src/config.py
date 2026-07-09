@@ -24,11 +24,17 @@ DOC_ITF = DATA_DIR / "itf-reglas-del-tenis-2026.pdf"
 COLLECTION_TORNEO = "reglamento_torneo_moncloa"
 COLLECTION_ITF = "reglamento_itf"
 
-# --- Modelos de Gemini --------------------------------------------------------
-# gemini-2.5-flash-lite: modelo usado en clase y mejor opción del free tier de esta
-# API key (los modelos 2.0 no tienen cuota gratuita y los 2.5 permiten ~20 req/día).
-# Hace tool-calling de forma fiable, ideal para el agente ReAct.
-CHAT_MODEL = "gemini-2.5-flash-lite"
+# --- Modelos ------------------------------------------------------------------
+# Proveedor del LLM de chat: "groq" (free tier amplio, miles de req/día) o "gemini"
+# (~20 req/día en free tier). Configurable por variable de entorno LLM_PROVIDER.
+# Los EMBEDDINGS siempre usan Gemini (su cuota es independiente de la de chat).
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
+
+# Modelo de chat según proveedor.
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash-lite")
+
+# Embeddings de Gemini (cuota separada de la de chat).
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 
 # --- Parámetros de troceado (chunking) y recuperación -------------------------
@@ -38,11 +44,13 @@ TOP_K = 4
 
 
 def load_api_key() -> str:
-    """Carga la API key de Gemini desde el entorno o desde un archivo .env.
+    """Carga las API keys necesarias desde el entorno o un archivo .env.
 
-    `langchain-google-genai` espera la variable ``GOOGLE_API_KEY``. En el máster
-    la guardamos como ``GEMINI_API_KEY``, así que aceptamos ambas y normalizamos.
-    Nunca se escribe la clave en el código (buena práctica de la consigna).
+    - Embeddings: siempre Gemini → se requiere ``GOOGLE_API_KEY`` (o ``GEMINI_API_KEY``).
+      `langchain-google-genai` espera ``GOOGLE_API_KEY``, así que normalizamos.
+    - Chat: si ``LLM_PROVIDER == "groq"`` se requiere además ``GROQ_API_KEY``.
+
+    Nunca se escribe ninguna clave en el código (buena práctica de la consigna).
     """
     # Busca un .env en la raíz del proyecto y en la carpeta de clase.
     for candidate in (ROOT_DIR / ".env", ROOT_DIR / ".env" / ".env"):
@@ -55,9 +63,14 @@ def load_api_key() -> str:
     key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
     if not key:
         raise RuntimeError(
-            "No se encontró la API key de Gemini. Definí GOOGLE_API_KEY o "
-            "GEMINI_API_KEY en un archivo .env o como variable de entorno."
+            "No se encontró la API key de Gemini (necesaria para los embeddings). "
+            "Definí GOOGLE_API_KEY o GEMINI_API_KEY en un archivo .env."
         )
-    # Normalizamos para que las librerías de Google la encuentren.
-    os.environ["GOOGLE_API_KEY"] = key
+    os.environ["GOOGLE_API_KEY"] = key  # normalizamos para las librerías de Google
+
+    if LLM_PROVIDER == "groq" and not os.getenv("GROQ_API_KEY"):
+        raise RuntimeError(
+            "LLM_PROVIDER=groq pero falta GROQ_API_KEY. Añadila al .env o poné "
+            "LLM_PROVIDER=gemini para usar Gemini como LLM de chat."
+        )
     return key

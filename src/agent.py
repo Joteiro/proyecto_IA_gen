@@ -10,11 +10,21 @@ import re
 import time
 
 from langchain_core.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.prebuilt import create_react_agent
 
 from . import config
+
+
+def _crear_llm():
+    """Instancia el LLM de chat según ``config.LLM_PROVIDER`` (groq o gemini)."""
+    if config.LLM_PROVIDER == "groq":
+        from langchain_groq import ChatGroq
+
+        return ChatGroq(model=config.GROQ_MODEL, temperature=0)
+    from langchain_google_genai import ChatGoogleGenerativeAI
+
+    return ChatGoogleGenerativeAI(model=config.CHAT_MODEL, temperature=0)
 from .rag import formatear_documentos, obtener_vectorstores
 
 # --- System prompt ------------------------------------------------------------
@@ -71,7 +81,7 @@ def construir_agente(persistir_chroma: bool = True):
         generales del juego como puntuación, tie-break, saque o cambios de lado."""
         return formatear_documentos(ret_itf.invoke(consulta))
 
-    llm = ChatGoogleGenerativeAI(model=config.CHAT_MODEL, temperature=0)
+    llm = _crear_llm()
 
     agente = create_react_agent(
         model=llm,
