@@ -1,0 +1,16 @@
+# Entorno y secretos
+.env
+.env/
+venv/
+.venv/
+
+# Base vectorial persistida (se reconstruye a partir de los PDFs)
+chroma_db/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml
