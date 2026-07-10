@@ -8,6 +8,13 @@ Distrito de Moncloa-Aravaca 2025-2026** (un torneo de tenis amateur) aplicando
 que el reglamento del torneo no cubre, el agente **recurre automáticamente** a
 las *Reglas del Tenis de la ITF 2026* como fuente de respaldo.
 
+### 🌐 App en vivo
+
+**Probá el asistente desplegado:** **https://proyectoiagen.streamlit.app/**
+
+> Nota: usa el free tier de Gemini/Groq; si la app estuvo inactiva, la primera
+> pregunta puede tardar unos segundos mientras indexa los reglamentos.
+
 ---
 
 ## 🧠 Dominio elegido
