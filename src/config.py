@@ -30,8 +30,9 @@ COLLECTION_ITF = "reglamento_itf"
 # Los EMBEDDINGS siempre usan Gemini (su cuota es independiente de la de chat).
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "groq").lower()
 
-# Modelo de chat según proveedor.
-GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+# Modelo de chat según proveedor. Groq deprecó la línea Llama 3.x; usamos el
+# modelo abierto de OpenAI servido por Groq, que soporta tool-calling.
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash-lite")
 
 # Embeddings de Gemini (cuota separada de la de chat).

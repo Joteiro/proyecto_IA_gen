@@ -10,7 +10,7 @@ import uuid
 
 import streamlit as st
 
-from src.agent import construir_agente, extraer_texto
+from src.agent import construir_agente, preguntar
 from src.config import load_api_key
 
 st.set_page_config(page_title="Asistente Reglamento de Tenis 🎾", page_icon="🎾")
@@ -67,12 +67,10 @@ if pregunta := st.chat_input("Escribí tu pregunta sobre el reglamento…"):
 
     with st.chat_message("assistant"):
         with st.spinner("Consultando el reglamento…"):
-            respuesta = extraer_texto(
-                agente.invoke(
-                    {"messages": [{"role": "user", "content": pregunta}]},
-                    config={"configurable": {"thread_id": st.session_state.thread_id}},
-                )["messages"][-1].content
-            )
+            try:
+                respuesta = preguntar(agente, pregunta, thread_id=st.session_state.thread_id)
+            except Exception as e:  # noqa: BLE001 - mostrar error legible en la UI
+                respuesta = f"⚠️ No pude responder ahora mismo: {e}"
         st.markdown(respuesta)
 
     st.session_state.messages.append({"role": "assistant", "content": respuesta})
